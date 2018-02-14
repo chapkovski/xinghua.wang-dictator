@@ -1,0 +1,15 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    Result
+{% endblock %}
+
+{% block content %}
+    <p>
+        You decided to donate <strong>{{player.donate }}</strong> to the charity and to keep <strong>{{ keep }}</strong> for yourself.
+
+        {% next_button %}
+    </p>
+    {% include Constants.instructions_template %}
+{% endblock %}
