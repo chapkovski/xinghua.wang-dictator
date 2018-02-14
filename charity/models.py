@@ -3,7 +3,7 @@ from otree.api import (
     Currency as c, currency_range
 )
 import random
-
+from dictatorupf.models import Constants as DConstants
 
 doc = """
 One player decides how to divide a certain amount between himself and the other
@@ -18,7 +18,7 @@ S285-S300.
 
 class Constants(BaseConstants):
     name_in_url = 'charity'
-    players_per_group =None
+    players_per_group = None
     num_rounds = 1
 
     instructions_template = 'charity/Instructions.html'
@@ -29,19 +29,30 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     def creating_session(self):
-        payoff = Constants.endowment - self.player.donate
-        self.participant.vars['keep'] = payoff
-        paying_round = random.randint(1, Constants.num_rounds)
-        self.session.vars['paying_round'] = paying_round
+        num_d_rounds = DConstants.num_rounds
+        tot_rounds = num_d_rounds + Constants.num_rounds
+        if self.round_number == 1:
+            for p in self.session.get_participants():
+                p.vars['paying_round'] = random.randint(1, tot_rounds)
+
 
 class Group(BaseGroup):
-   pass
+    pass
+
 
 class Player(BasePlayer):
+    final_payoff = models.CurrencyField()
+    paying_round = models.IntegerField()
     donate = models.CurrencyField(
         doc="""Amount of donation""",
         min=0, max=Constants.endowment,
         verbose_name='I will donate (from 0 to %i)' % Constants.endowment
     )
 
-
+    def set_payoff(self):
+        self.payoff = Constants.endowment - self.donate
+        self.paying_round = self.participant.vars['paying_round']
+        if self.paying_round > DConstants.num_rounds:
+            self.final_payoff = self.payoff
+        else:
+            self.final_payoff = self.participant.dictatorupf_player.filter(round_number=self.paying_round).first().payoff

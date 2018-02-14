@@ -8,26 +8,30 @@ class Introduction(Page):
 
 
 class Offer(Page):
-    form_model = models.Player
+    form_model = 'player'
     form_fields = ['donate']
 
 
-
 class Results(Page):
-    def keep(self):
-        return Constants.endowment - self.player.donate
-
     def vars_for_template(self):
         return {
             'keep': Constants.endowment - self.player.donate,
         }
 
+    def before_next_page(self):
+        self.player.set_payoff()
+
+
 class ResultsSummary(Page):
     def vars_for_template(self):
+        rounds = self.participant.dictatorupf_player.all()
+        nrounds = rounds.count()
+
         return {
-            'paying_round': self.session.vars['paying_round'],
-            'payoff':  self.participant.vars['keep'],
+            'rounds': rounds,
+            'nrounds': nrounds,
         }
+
 
 page_sequence = [
     Introduction,

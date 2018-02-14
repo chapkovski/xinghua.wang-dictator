@@ -7,15 +7,19 @@
 
 {% block content %}
     <p>
-        Your payoffs in the two rounds of Task 1.
-       payoffs = [p.payoff in self.player.participant.dictatorupf_player.all()]
+        Your payoffs in the {{ nrounds }} rounds of Task 1:
+    <ul>
+        {%  for r in rounds %}
+            <li>Payoff in round {{ r.round_number }}: <b>{{ r.payoff }}</b></li>
+        {% endfor %}
+</ul>
 
     </p>
     <p>
-        In Task 2, your payoff is {{ payoff }}.
+        In Task 2, your payoff is {{ player.payoff }}.
     </p>
     <p>
-        The paying round is {{ paying_round }}. Your payoff therefore is
+        The paying round is {{ player.paying_round }}. Your payoff therefore is {{ player.final_payoff }}
     </p>
 
 {% endblock %}

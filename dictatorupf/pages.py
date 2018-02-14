@@ -8,7 +8,7 @@ class Introduction(Page):
 
 
 class Offer(Page):
-    form_model = models.Group
+    form_model = 'group'
     form_fields = ['kept']
 
     def is_displayed(self):
